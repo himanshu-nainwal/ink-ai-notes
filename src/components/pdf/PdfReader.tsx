@@ -550,23 +550,24 @@ function StickyView({ sticky, onUpdate }: { sticky: any; onUpdate: () => void })
   }, [content, sticky, onUpdate]);
 
   return (
-    <div className="sticky-note group" style={{ left: `${sticky.x * 100}%`, top: `${sticky.y * 100}%` }} onClick={(e) => e.stopPropagation()}>
-      <button 
-        onClick={async () => { 
-          await supabase.from("sticky_notes").delete().eq("id", sticky.id); 
-          onUpdate(); 
-        }}
-        className="absolute top-1.5 right-1.5 p-0.5 rounded-full hover:bg-black/10 text-black/40 hover:text-black/80 transition-colors cursor-pointer z-10 opacity-0 group-hover:opacity-100 focus:opacity-100"
-        title="Delete note"
-      >
-        <X className="h-3.5 w-3.5" />
-      </button>
+    <div className="sticky-note" style={{ left: `${sticky.x * 100}%`, top: `${sticky.y * 100}%` }} onClick={(e) => e.stopPropagation()}>
       <Textarea 
         value={content} 
         onChange={(e) => setContent(e.target.value)}
         placeholder="Write note..."
-        className="w-full h-full resize-none border-none bg-transparent p-0 pr-5 text-xs shadow-none focus-visible:ring-0 focus-visible:outline-none focus:outline-none text-black placeholder:text-black/40 min-h-0" 
+        className="w-full h-full resize-none border-none bg-transparent p-0 pr-6 pt-1 text-xs shadow-none focus-visible:ring-0 focus-visible:outline-none focus:outline-none text-black placeholder:text-black/40 min-h-0" 
       />
+      <button 
+        onClick={async (e) => { 
+          e.stopPropagation();
+          await supabase.from("sticky_notes").delete().eq("id", sticky.id); 
+          onUpdate(); 
+        }}
+        className="absolute top-1 right-1 p-0.5 rounded-full bg-black/5 hover:bg-red-500 hover:text-white text-black/50 transition-colors cursor-pointer z-20 shadow-sm"
+        title="Delete note"
+      >
+        <X className="h-3 w-3" />
+      </button>
     </div>
   );
 }
