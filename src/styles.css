@@ -168,6 +168,7 @@
 /* Sticky note */
 .sticky-note {
   position: absolute;
+  z-index: 30;
   width: 200px;
   min-height: 80px;
   padding: 10px 12px;

@@ -473,7 +473,7 @@ function PdfPageView({ pdfId, pNum, zoom, tool, hlColor, pageSize, onPageLoad, q
     const y = (e.clientY - rect.top) / rect.height;
     const { data: u } = await supabase.auth.getUser();
     await supabase.from("sticky_notes").insert({
-      user_id: u.user!.id, pdf_id: pdfId, page: pNum, x, y, content: "New note…",
+      user_id: u.user!.id, pdf_id: pdfId, page: pNum, x, y, content: "",
     });
     qc.invalidateQueries({ queryKey: ["sticky", pdfId, pNum] });
   };
@@ -538,7 +538,7 @@ function PdfPageView({ pdfId, pNum, zoom, tool, hlColor, pageSize, onPageLoad, q
 
 function StickyView({ sticky, onUpdate }: { sticky: any; onUpdate: () => void }) {
   const [content, setContent] = useState(sticky.content);
-  const [editing, setEditing] = useState(false);
+
   useEffect(() => {
     const t = setTimeout(async () => {
       if (content !== sticky.content) {
@@ -550,18 +550,23 @@ function StickyView({ sticky, onUpdate }: { sticky: any; onUpdate: () => void })
   }, [content, sticky, onUpdate]);
 
   return (
-    <div className="sticky-note" style={{ left: `${sticky.x * 100}%`, top: `${sticky.y * 100}%` }} onClick={(e) => e.stopPropagation()}>
-      <div className="mb-1 flex justify-end">
-        <button onClick={async () => { await supabase.from("sticky_notes").delete().eq("id", sticky.id); onUpdate(); }}>
-          <X className="h-3 w-3" />
-        </button>
-      </div>
-      {editing ? (
-        <Textarea autoFocus value={content} onChange={(e) => setContent(e.target.value)} onBlur={() => setEditing(false)}
-          className="h-24 resize-none border-none bg-transparent p-0 text-sm focus-visible:ring-0" />
-      ) : (
-        <div onDoubleClick={() => setEditing(true)} className="whitespace-pre-wrap text-sm">{content || "Double-click to edit"}</div>
-      )}
+    <div className="sticky-note group" style={{ left: `${sticky.x * 100}%`, top: `${sticky.y * 100}%` }} onClick={(e) => e.stopPropagation()}>
+      <button 
+        onClick={async () => { 
+          await supabase.from("sticky_notes").delete().eq("id", sticky.id); 
+          onUpdate(); 
+        }}
+        className="absolute top-1.5 right-1.5 p-0.5 rounded-full hover:bg-black/10 text-black/40 hover:text-black/80 transition-colors cursor-pointer z-10 opacity-0 group-hover:opacity-100 focus:opacity-100"
+        title="Delete note"
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
+      <Textarea 
+        value={content} 
+        onChange={(e) => setContent(e.target.value)}
+        placeholder="Write note..."
+        className="w-full h-full resize-none border-none bg-transparent p-0 pr-5 text-xs shadow-none focus-visible:ring-0 focus-visible:outline-none focus:outline-none text-black placeholder:text-black/40 min-h-0" 
+      />
     </div>
   );
 }
